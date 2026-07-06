@@ -1,0 +1,407 @@
+<!doctype html>
+<html >
+<head>
+<title>MKT Toolbox</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+
+	<meta name="msapplication-config" content="/browserconfig.xml"/>
+
+	<meta name="application-name" content="MKT Toolbox"/>
+
+	<meta name="apple-mobile-web-app-title" content="MKT Toolbox"/>
+
+	<meta name="theme-color" content="#343a40"/>
+
+	<meta name="msapplication-TileColor" content="#ff58a5"/>
+
+	<meta name="msapplication-TileImage" content="/themes/mk/images/favicons/mstile-144x144.png"/>
+
+
+<link rel="manifest" href="/manifest.webmanifest"  />
+
+<link rel="shortcut icon" href="/themes/mk/images/favicons/favicon.ico" type="image/ico" />
+
+<link rel="icon" href="/themes/mk/images/favicons/favicon-16x16.png" type="image/png" sizes="16x16" />
+
+<link rel="icon" href="/themes/mk/images/favicons/favicon-32x32.png" type="image/png" sizes="32x32" />
+
+<link rel="icon" href="/themes/mk/images/favicons/favicon-96x96.png" type="image/png" sizes="96x96" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-57x57.png" sizes="57x57" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-60x60.png" sizes="60x60" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-72x72.png" sizes="72x72" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-76x76.png" sizes="76x76" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-114x114.png" sizes="114x114" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-120x120.png"  />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-144x144.png" sizes="144x144" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-152x152.png" sizes="152x152" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-180x180.png" sizes="180x180" />
+
+<link rel="apple-touch-icon" href="/themes/mk/images/favicons/apple-touch-icon-167x167.png" sizes="167x167" />
+
+<link rel="icon" href="/themes/mk/images/favicons/android-chrome-192x192.png" type="image/png" sizes="192x192" />
+
+<link rel="mask-icon" href="/themes/mk/images/favicons/safari-pinned-tab.svg" color="#ff58a5" />
+
+
+
+<link href="/themes/library/bootstrap/css/bootstrap.css?1645825533" rel="stylesheet" type="text/css"/>
+
+
+
+
+<link href="/themes/library/material-design-icons/css/material-icons.css?1645825534" rel="stylesheet" type="text/css"/>
+
+
+
+
+<link href="/themes/bootstrap/css/main.css?1639690220" rel="stylesheet" type="text/css"/>
+
+
+
+
+<link href="/modules/notifier/bootstrap/css/style.css?1645825534" rel="stylesheet" type="text/css"/>
+
+
+
+
+<link href="/themes/mk/modules/security/css/ff.modules.security.css?1645825534" rel="stylesheet" type="text/css"/>
+
+
+
+
+<link href="/themes/mk/css/main.css?1683234599" rel="stylesheet" type="text/css"/>
+
+
+
+
+<script src="/themes/library/jquery/jquery.js?1645825533"></script>
+
+<script src="/themes/library/bowser/bundled.js?1645825533"></script>
+
+<script src="/themes/library/ff/ff.js?1647288094"></script>
+
+<script src="/themes/library/ff/ffEvent.js?1645825533"></script>
+
+<script src="/themes/library/ff/ffEvents.js?1645825533"></script>
+
+<script src="/themes/bootstrap/js/pwa.js?1630242347"></script>
+
+<script src="/themes/bootstrap/js/ff.customize.js?1682027791"></script>
+
+<script src="/themes/library/popper/dist/umd/popper.js?1645825533"></script>
+
+<script src="/themes/library/bootstrap/js/bootstrap.js?1645825533"></script>
+
+<script src="/themes/library/plugins/bs.blockui/bs.blockui.js?1645825534"></script>
+
+<script src="/themes/library/ff/ajax.js?1683245508"></script>
+
+<script src="/themes/bootstrap/js/ff.ajax.customize.js?1635195810"></script>
+
+<script src="/themes/bootstrap/ff/ffPage/ffPage.js?1636560353"></script>
+
+<script src="/modules/security/bootstrap/js/ff.modules.security.js?1650818033"></script>
+
+<script src="/modules/security/bootstrap/js/oauth2.js?1682028171"></script>
+
+<script>			ff.pluginAddInit("ff.ajax", function () {
+				ff.ajax.addEvent({
+					"event_name"	: "onSuccess"
+					, "func_name"	: function (data, params, injectid) {
+						if (data.modules && data.modules.security) {
+							// update session data
+							ff.modules.security.session.csrf.value	= data.modules.security.csrf_value;
+							jQuery("#" + ff.modules.security.session.csrf.param).val(data.modules.security.csrf_value);						}
+					}
+				});
+				ff.addEvent({
+					"event_name" : "fixFields"
+					, "func_name" : function (fields, lastret) {
+						let ret = lastret || fields;
+						
+						if (!ret) {
+						    return ret;
+						}
+
+                        ret.unbufferedEach(function (i, v) {
+                            if (v.name === ff.modules.security.session.csrf.param) {
+                                if (ff.modules.security.session.loggedin) {
+                                    v.value = ff.modules.security.session.csrf.value;
+                                } else {
+                                    ret.unset(i);
+                                }
+                            }
+                        });
+			
+						return ret;
+					}
+				});
+			}, "0a1f6a4f-2177-42ca-92e2-89bd35b0dab7");</script>
+
+<script>jQuery(function ($, undefined) {
+	ff.pluginAddInit("ff.modules.security", function () {
+		
+		ff.modules.security.services.login = '/login/';
+		
+		
+		
+		ff.modules.security.services.oauth2 = '/services/oauth2/';
+		
+		ff.modules.security.session.session_name = 'PHPSESSBDG';
+		
+		
+		ff.modules.security.session.csrf || (ff.modules.security.session.csrf = {});
+		ff.modules.security.session.csrf.param	= '_CSRF_';
+		ff.modules.security.session.csrf.value	= undefined;
+		
+		
+		ff.modules.security.services.register.activation_resend	= '/services/mod_security/register/resend_activation';
+		
+	}, '8300e66c-01a7-4dda-b59d-426f235c4ed4');
+}(jQuery));
+</script>
+
+<script src="/themes/library/plugins/jquery.cookie/jquery.cookie.js?1645825534"></script>
+
+<script src="/modules/notifier/js/notifier.js?1682028171"></script>
+
+<script src="/modules/security/bootstrap/js/google.js?1639695221"></script>
+
+<script>
+	ff.initFF({
+		"site_path"		: "", 
+		"theme"			: "mk", 
+		"theme_ui"		: "base", 
+		"language"		: "ENG", 
+		"layer"			: "empty",
+		
+		"getlibs"	: "/services/getlibs/",
+		
+            
+		"struct"		: ff.hash([
+			{'id': 'fields', 'value' : ff.hash([
+				
+			])},
+			{'id': 'comps', 'value' : ff.hash([
+				
+			])}
+		])
+		
+		, "libs"		: [
+			
+			{'type' : 'css', 'id' : 'bootstrap.base', 'deps' : undefined, 'media' : undefined} ,
+			{'type' : 'css', 'id' : 'material-icons', 'deps' : undefined, 'media' : undefined} ,
+			{'type' : 'css', 'id' : 'bsmain', 'deps' : undefined, 'media' : undefined} ,
+			{'type' : 'css', 'id' : 'ff.modules.notifier.style', 'deps' : undefined, 'media' : undefined} ,
+			{'type' : 'css', 'id' : 'ff.modules.security.css', 'deps' : undefined, 'media' : undefined} ,
+			{'type' : 'css', 'id' : 'main', 'deps' : undefined, 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'jquery', 'deps' : undefined, 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'bowser', 'deps' : undefined, 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff', 'deps' : ff.hash([{'id' : 'js', 'value' : ['jquery', 'bowser']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.ffEvent', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.ffEvents', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.pwa', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.customize', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'popper', 'deps' : ff.hash([{'id' : 'js', 'value' : ['jquery']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'bootstrap', 'deps' : ff.hash([{'id' : 'js', 'value' : ['jquery', 'popper']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'bootstrap.plugins.blockui', 'deps' : ff.hash([{'id' : 'js', 'value' : ['bootstrap']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.ajax', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff', 'bootstrap.plugins.blockui']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.ajax.customize', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff.ajax']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.ffPage', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff', 'bootstrap']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.modules.security', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.modules.security.oauth2', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'jquery.plugins.cookie', 'deps' : ff.hash([{'id' : 'js', 'value' : ['jquery']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.modules.notifier', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff', 'jquery.plugins.cookie']}]), 'media' : undefined} ,
+			{'type' : 'js', 'id' : 'ff.modules.security.google', 'deps' : ff.hash([{'id' : 'js', 'value' : ['ff']}]), 'media' : undefined} ,
+		]
+		
+	});
+	
+	
+	
+</script>
+
+<script src="/themes/bootstrap/js/locale/eng.js?1682771226"></script>
+
+<script>ff.libLoadStatic('js', 'ff.locale');</script>
+
+<script>ff.pwa.init({ 
+	service_worker	: "/service-worker.js"
+});
+ff.pwa.serviceWorker.register();</script>
+
+<script>ff.libLoadStatic('js', 'sw-integration');</script>
+
+<script src="/themes/mk/js/main.js?1685602485"></script>
+
+<script>ff.libLoadStatic('js', 'main');</script>
+
+<script>ff.pluginAddInit("ff.modules.notifier", function () {
+    ff.modules.notifier.settings.services.pill_viewed = '/services/mod-notifier/pill/viewed';
+    ff.modules.notifier.settings.services.pill_get_messages = '/services/mod-notifier/pill/get-messages';
+    ff.modules.notifier.settings.services.get_message = '/services/mod-notifier/get-messages';
+    ff.modules.notifier.settings.services.set_message = '/services/mod-notifier/set-message';
+});</script>
+
+<script>ff.libLoadStatic('js', 'ff.modules.notifier.init');</script>
+
+
+
+</head>
+<body class="mod-sec-login"><a href="https://www.mkttoolbox.com/cdn-cgi/content?id=ffKiv3oxpc5bSICsEYWQJpIANN1lquOSexGl3qeQJaA-1783200774.5639322-1.2.1.1-HKP8aXhcuWBcPkP7q9ufrXJ4HHSL34oYZEkXAScAN1E" aria-hidden="true" rel="nofollow noopener" style="display: none !important; visibility: hidden !important"></a>
+
+	<form id="frmMain" name="frmMain" method="post" action="" enctype="">
+	
+	<input disabled="disabled" type="text" value="" style="position:fixed; bottom:0px; right: 0px; width:1px; height:1px; margin:0px; padding: 0px; background-color: transparent; border: 0px;" />
+	
+    <div id="frmMain_hidden" class="hidden">
+        
+            <input type="hidden" id="frmAction" name="frmAction" value="" />
+        
+    </div>
+
+	<div id="ffLoginBox" class="container-fluid vh-100 loginBox social">
+	<div class="row h-100 align-items-sm-center">
+		<div class="col">
+			
+			<div class="card mx-auto shadow mt-5 mt-md-0" style="max-width: 50rem;">
+				<div class="card-header text-center h4 text-secondary font-weight-light">
+					MKT Toolbox | Login
+				</div>
+				<div class="card-body">
+
+					
+					<div class="container-fluid">
+						<div class="col login-logo-img">&nbsp;</div>
+					</div>
+					
+					
+					
+<script type="text/javascript">
+ff.pluginAddInit("ff.modules.notifier", function () {
+
+
+		
+		ff.modules.notifier.initListener("", "/services/mod-notifier/get-messages");
+
+
+		jQuery(function() {
+			ff.modules.notifier.processQueue("");
+		});
+	});
+</script>
+
+
+
+
+<div class="mod-notifier-messages mod_notifier_message_queue w-100"></div>
+						
+					
+
+					<div class="row">
+						
+						<div class="col-sm text-center">
+							<div class="form-check login-field mb-3">
+								<input class="form-check-input" type="checkbox" value="1"  id="keep_me_loggedin" name="keep_me_loggedin">
+								<label class="form-check-label" for="keep_me_loggedin">
+									Keep me Logged In
+								</label>
+							</div>
+						</div>
+						
+						
+						
+						
+						<div class="col-sm text-center">
+							<div id="modsec_googlelogin" class="d-flex justify-content-center"></div>
+						</div>
+						<script>
+							jQuery(function() {
+								ff.pluginAddInit("ff.modules.security.google", function () {
+									ff.modules.security.google.drawButton({
+										client_id : '798065334334-2geser2k3tntt9roe48ns7kjmn3pa4u2.apps.googleusercontent.com',
+										response_url : '/login/social//google/response?ret_url=%2Finventory%2Fdrivers%2F&',
+										container : jQuery("#modsec_googlelogin").get(0),
+										params : {theme: 'outline', size: 'large'},
+										ctx : undefined,
+									});
+								});
+							});
+						</script>
+						
+						
+						
+						
+					</div>
+
+					
+						
+
+						<div class="form-group login-field">
+							<label for="username" class="text-secondary font-weight-light">Username or E-Mail</label>
+							<input class="form-control" type="text" id="username" name="username" value="" autocomplete="username" />
+						</div>
+						
+						<div class="form-group login-field">
+							<label for="password" class="text-secondary font-weight-light">Password</label>
+							<input class="form-control" onkeydown="return ff.submitProcessKey(event, 'btLogin')" type="password" id="password" name="password" value="" autocomplete="current-password" />
+						</div>
+						<div class="row">
+							
+						</div>
+
+						<div class="nav justify-content-center row pl-3 pr-3">
+							<input class="btn btn-primary col" id="btLogin" type="button" value="Login" onclick="jQuery('#frmAction', this.form).val('login'); this.form.submit();" />
+						</div>
+					
+
+					<script type="text/javascript">
+						jQuery('#username').focus();
+					</script>
+
+				</div>
+				
+				<div class="card-footer">
+					<div class="nav justify-content-center links"> 
+						
+							<a class="nav-link text-secondary" href="/">Home</a>
+						
+						
+							<a class="nav-link text-secondary" href="/recover/?ret_url=%2Flogin%2F%3Fret_url%3D%252Finventory%252Fdrivers%252F%26&">Recover Password</a>
+						
+						
+							<a class="nav-link text-secondary " href="/registrati/?ret_url=%2Finventory%2Fdrivers%2F&">Create Account</a>
+						
+						<a class="nav-link text-secondary" href="/wiki/" target="_blank">Wiki</a>
+					</div>
+				</div>
+			
+			</div>
+			
+			<a href="https://www.ffphp.com/" class="d-block mx-auto mt-5 logo-forms"></a>
+				
+		</div>
+	</div>
+</div>
+
+
+
+
+
+	</form>
+
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"04ce2205df2b4c75bf9fffdf19f5abe8","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

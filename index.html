@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MKT Facilitator - Planejador de Inventário</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal active">
+        <div class="modal-content">
+            <h2>Selecione seu Perfil</h2>
+            <p>Faça login em um perfil local para salvar o seu progresso.</p>
+            <div class="profile-list" id="profile-list"></div>
+            
+            <div style="margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem;">
+                <h3>Criar Novo Perfil</h3>
+                <input type="text" id="new-profile-name" placeholder="Digite o nome do perfil...">
+                <button id="btn-create-profile" class="btn btn-primary" style="margin-top: 0.5rem;">Criar Perfil</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <h1>MKT Facilitator</h1>
+        <p>Planeje seu inventário de Pilotos, Carros e Asas-deltas</p>
+        <div class="user-info" id="user-info" style="display: none; margin-top: 10px;">
+            <span style="font-weight: 600;">Perfil atual: <span id="current-user-name" style="color: var(--star-yellow);"></span></span>
+            <button id="btn-logout" class="btn btn-sm btn-outline" style="color: white; border-color: white; margin-left: 10px;">Trocar Perfil</button>
+        </div>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab-btn active" data-target="tab-database">Banco de Dados</button>
+        <button class="tab-btn" data-target="tab-inventory">Meu Inventário</button>
+        <button class="tab-btn" data-target="tab-recommendations">Recomendações</button>
+        <button class="tab-btn" data-target="tab-ranking">Tier List / Ranking</button>
+        <button class="tab-btn" data-target="tab-calculators">Calculadoras e Pistas</button>
+    </nav>
+
+    <main class="container">
+        <!-- Tab: Banco de Dados -->
+        <section id="tab-database" class="tab-content active">
+            <div class="card">
+                <h2>Itens Oficiais</h2>
+                <p>Todos os Pilotos, Carros e Asas-deltas do jogo foram importados. Use a busca abaixo:</p>
+                <input type="text" id="db-search" placeholder="Pesquisar por nome do item..." style="margin-bottom: 1rem;">
+                <div class="filters">
+                    <button class="btn btn-sm btn-outline active" data-filter="all">Todos</button>
+                    <button class="btn btn-sm btn-outline" data-filter="driver">Pilotos</button>
+                    <button class="btn btn-sm btn-outline" data-filter="kart">Carros</button>
+                    <button class="btn btn-sm btn-outline" data-filter="glider">Asas-deltas</button>
+                </div>
+                <ul id="db-items-list" class="item-list"></ul>
+            </div>
+        </section>
+
+        <!-- Tab: Meu Inventário -->
+        <section id="tab-inventory" class="tab-content">
+            <div class="card">
+                <h2>Itens que eu possuo</h2>
+                <p>Selecione os itens que você já tem e ajuste o <strong>Nível</strong> para calcular a cobertura de pistas exata.</p>
+                <div style="margin: 15px 0; padding: 10px; background: #f0ecfc; border-radius: 8px; border: 1px solid #dcd1f5;">
+                    <label style="font-weight: 600; color: #5a2e98; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="inv-filter-exclusive" onchange="applyInventoryFilters()">
+                        Mostrar Apenas Itens com Pistas Exclusivas
+                    </label>
+                    <p style="margin: 5px 0 0 25px; font-size: 0.85rem; color: #666;">
+                        Mostra apenas os itens que possuem pistas únicas (nenhum outro item seu cobre essa pista).
+                    </p>
+                </div>
+                
+                <div style="margin: 15px 0; padding: 15px; background: #eef8f5; border-radius: 8px; border: 1px solid #cce8dd; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h3 style="margin-top: 0; color: #2d8a64;">Importar do MKT Toolbox</h3>
+                        <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #555;">Você pode importar seu inventário automaticamente enviando o arquivo CSV exportado do site MKT Toolbox.</p>
+                    </div>
+                    <div>
+                        <input type="file" id="mkt-toolbox-file" accept=".csv" style="display: none;">
+                        <button class="btn btn-primary" style="background-color: #2d8a64; border-color: #2d8a64;" onclick="document.getElementById('mkt-toolbox-file').click()">Selecionar CSV</button>
+                    </div>
+                </div>
+                
+                <div style="margin: 15px 0; padding: 15px; background: #eef8f5; border-radius: 8px; border: 1px solid #cce8dd; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h3 style="margin-top: 0; color: #2d8a64;">Fazer Backup / Transferir para Celular</h3>
+                        <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #555;">Exporte seus itens para um arquivo JSON para transferir para o seu celular ou outro computador, e importe-o de volta quando quiser.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" style="background-color: #2d8a64; border-color: #2d8a64;" onclick="exportAppBackup()">Exportar Backup</button>
+                        <input type="file" id="app-backup-file" accept=".json" style="display: none;">
+                        <button class="btn btn-outline" style="color: #2d8a64; border-color: #2d8a64;" onclick="document.getElementById('app-backup-file').click()">Restaurar Backup</button>
+                    </div>
+                </div>
+
+
+                <div class="filters" id="inv-category-filters" style="margin-bottom: 1rem; text-align: center;">
+                    <button class="btn btn-sm btn-outline active" onclick="switchInvCategory(event, 'driver')">Pilotos</button>
+                    <button class="btn btn-sm btn-outline" onclick="switchInvCategory(event, 'kart')">Carros</button>
+                    <button class="btn btn-sm btn-outline" onclick="switchInvCategory(event, 'glider')">Asas-deltas</button>
+                </div>
+
+                <div class="inventory-grid" id="inv-grid-container" style="display: block;">
+                    <div class="inventory-section" id="inv-section-driver">
+                        <input type="text" id="inv-search-driver" placeholder="Buscar piloto..." class="inv-search">
+                        <ul id="inv-driver-list" class="checkbox-list inv-larger-list"></ul>
+                    </div>
+                    <div class="inventory-section" id="inv-section-kart" style="display: none;">
+                        <input type="text" id="inv-search-kart" placeholder="Buscar carro..." class="inv-search">
+                        <ul id="inv-kart-list" class="checkbox-list inv-larger-list"></ul>
+                    </div>
+                    <div class="inventory-section" id="inv-section-glider" style="display: none;">
+                        <input type="text" id="inv-search-glider" placeholder="Buscar asa-delta..." class="inv-search">
+                        <ul id="inv-glider-list" class="checkbox-list inv-larger-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Recomendações -->
+        <section id="tab-recommendations" class="tab-content">
+            <div class="card">
+                <h2>Cobertura Atual</h2>
+                <p>Baseado nos itens que você possui e no nível que eles estão:</p>
+                <div class="coverage-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">Pistas com Piloto</span>
+                        <span id="stat-driver-cov" class="stat-value">0/0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Pistas com Carro</span>
+                        <span id="stat-kart-cov" class="stat-value">0/0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Pistas com Asa-delta</span>
+                        <span id="stat-glider-cov" class="stat-value">0/0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-2">
+                <h2>Recomendações de Aquisição</h2>
+                <p>Os itens abaixo fornecerão o maior número de pistas novas, <strong>assumindo que você os adquira no Nível 1</strong>.</p>
+                
+                <div class="recommendations-container">
+                    <div class="rec-column">
+                        <h3 class="driver-color">Melhores Pilotos</h3>
+                        <ul id="rec-driver-list" class="rec-list"></ul>
+                    </div>
+                    <div class="rec-column">
+                        <h3 class="kart-color">Melhores Carros</h3>
+                        <ul id="rec-kart-list" class="rec-list"></ul>
+                    </div>
+                    <div class="rec-column">
+                        <h3 class="glider-color">Melhores Asas-deltas</h3>
+                        <ul id="rec-glider-list" class="rec-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-2">
+                <h2>Recomendações de Upgrade (Itens Possuídos)</h2>
+                <p>Estes são os itens que você <strong>já possui</strong> e que oferecem a maior quantidade de pistas exclusivas (pistas que nenhum outro item seu cobre). Eles são os melhores candidatos para receberem bilhetes de pontos ou aumento de nível.</p>
+                
+                <div class="recommendations-container">
+                    <div class="rec-column">
+                        <h3 class="driver-color">Upgrades Pilotos</h3>
+                        <ul id="upg-driver-list" class="rec-list"></ul>
+                    </div>
+                    <div class="rec-column">
+                        <h3 class="kart-color">Upgrades Carros</h3>
+                        <ul id="upg-kart-list" class="rec-list"></ul>
+                    </div>
+                    <div class="rec-column">
+                        <h3 class="glider-color">Upgrades Asas-deltas</h3>
+                        <ul id="upg-glider-list" class="rec-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-2">
+                <h2>Rastreador de Redundância (Itens Obsoletos)</h2>
+                <p>Estes itens que você possui <strong>não precisam receber upgrades</strong> no momento. Para cada pista que eles cobrem, você já possui um outro item (do mesmo tipo) com nível igual ou superior. Portanto, investir neles agora seria desperdício de bilhetes.</p>
+                
+                <div class="recommendations-container">
+                    <div class="rec-column">
+                        <h3 class="driver-color" style="color: #c41c18;">Pilotos Redundantes</h3>
+                        <ul id="red-driver-list" class="rec-list"></ul>
+                    </div>
+                    <div class="rec-column">
+                        <h3 class="kart-color" style="color: #c41c18;">Carros Redundantes</h3>
+                        <ul id="red-kart-list" class="rec-list"></ul>
+                    </div>
+                    <div class="rec-column">
+                        <h3 class="glider-color" style="color: #c41c18;">Asas-deltas Redundantes</h3>
+                        <ul id="red-glider-list" class="rec-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Tier List / Ranking -->
+        <section id="tab-ranking" class="tab-content">
+            <div class="card">
+                <h2>Tier List Completa</h2>
+                <p>Veja quais são os itens do jogo que possuem o maior número total de pistas.</p>
+                <div class="filters" id="ranking-filters">
+                    <select id="rank-type-filter">
+                        <option value="all">Todos os Tipos</option>
+                        <option value="driver">Pilotos</option>
+                        <option value="kart">Carros</option>
+                        <option value="glider">Asas-deltas</option>
+                    </select>
+                    <select id="rank-rarity-filter">
+                        <option value="all">Todas as Raridades</option>
+                        <option value="HighEnd">High-End (Dourado)</option>
+                        <option value="Super">Super (Amarelo)</option>
+                        <option value="Normal">Normal (Prata)</option>
+                    </select>
+                </div>
+                
+                <ul id="ranking-list" class="item-list"></ul>
+            </div>
+        </section>
+
+        <!-- Tab: Calculadoras -->
+        <section id="tab-calculators" class="tab-content">
+            <div class="card">
+                <h2>Pesquisa de Pistas Específicas</h2>
+                <p>Vai correr em uma pista nas Copas Ranqueadas? Selecione a pista abaixo para ver quais itens você tem no Top Shelf (Nível Superior).</p>
+                
+                <div style="margin-top: 15px;">
+                    <label for="track-search-input" style="font-weight: 600; display: block; margin-bottom: 5px;">Selecione uma Pista:</label>
+                    <input type="text" id="track-search-input" list="track-datalist" placeholder="Ex: 3DS Rainbow Road..." style="width: 100%; max-width: 400px;">
+                    <datalist id="track-datalist"></datalist>
+                </div>
+                
+                <div id="track-results" style="margin-top: 20px; display: none;">
+                    <div class="recommendations-container">
+                        <div class="rec-column">
+                            <h3 class="driver-color">Pilotos Top Shelf</h3>
+                            <ul id="track-driver-list" class="rec-list"></ul>
+                        </div>
+                        <div class="rec-column">
+                            <h3 class="kart-color">Carros Top Shelf</h3>
+                            <ul id="track-kart-list" class="rec-list"></ul>
+                        </div>
+                        <div class="rec-column">
+                            <h3 class="glider-color">Asas-deltas Top Shelf</h3>
+                            <ul id="track-glider-list" class="rec-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-2">
+                <h2>Otimizador de Bilhetes de Nível</h2>
+                <p>Quantos bilhetes você tem? O simulador vai analisar seu inventário e recomendar qual item de cada raridade você deve evoluir +1 nível para ganhar o máximo de pistas novas.</p>
+                
+                <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <strong style="color: #856404;">⚠️ Atenção:</strong> Este cálculo exige muito processamento e pode demorar alguns segundos dependendo do seu dispositivo.
+                </div>
+                
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+                    <div>
+                        <label>Bilhetes High-End:</label>
+                        <input type="number" id="opt-tickets-he" value="1" min="0" style="width: 60px;">
+                    </div>
+                    <div>
+                        <label>Bilhetes Super:</label>
+                        <input type="number" id="opt-tickets-super" value="0" min="0" style="width: 60px;">
+                    </div>
+                    <div>
+                        <label>Bilhetes Normais:</label>
+                        <input type="number" id="opt-tickets-normal" value="0" min="0" style="width: 60px;">
+                    </div>
+                    <button class="btn btn-primary" onclick="runTicketOptimizer()">Calcular Melhor Rota</button>
+                </div>
+                
+                <div id="optimizer-results" style="display: none;">
+                    <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Plano de Ação Recomendado</h3>
+                    <ul id="opt-results-list" class="rec-list"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Import Database first, then App Logic -->
+    <script src="order.js"></script>
+    <script src="database.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
